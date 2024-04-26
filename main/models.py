@@ -111,8 +111,8 @@ class CartOrder(models.Model):
     product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
     
     
-    class Meta:
-        verbose_name_plural="Cart Order"
+    # class Meta:
+    #     verbose_name_plural="Cart Order"
     
     
 class CartOrderItems(models.Model):
