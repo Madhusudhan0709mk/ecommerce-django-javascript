@@ -16,7 +16,7 @@ STATUS={
     ("rejected","Rejected"),
 }
 
-Rating = {
+RATING = {
     (1,"★☆☆☆☆"),
     (2,"★★☆☆☆"),
     (3,"★★★☆☆"),
@@ -81,7 +81,7 @@ class Product(models.Model):
     featured = models.BooleanField(default=True)
     digital = models.BooleanField(default=True)
     
-    sku = ShortUUIDField(unique=True,length=10,max_length=20,alphabet="1234567890",prefix="sku")
+    sku = ShortUUIDField(unique=True,length=4,max_length=20,alphabet="1234567890",prefix="sku")
     
     date = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(null=True,blank=True)
@@ -129,3 +129,38 @@ class CartOrderItems(models.Model):
         
     def order_img(self):
         return self.image
+    
+class ProductReview(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null =True)
+    review = models.TextField()
+    rating = models.IntegerField(choices=RATING,default=None)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural="Product Review"
+        
+    def __str__(self):
+        return self.product.title
+    
+    def get_rating(self):
+        return self.rating
+    
+class  Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null =True)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural="Wishlist"
+        
+    def __str__(self):
+        return self.product.title
+    
+class Address(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True)
+    address = models.CharField(max_length=225,null =True)
+    status = models.BooleanField(default=False)
+    
+    class Meta:
+        verbose_name_plural="Address"
