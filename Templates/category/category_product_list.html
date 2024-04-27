@@ -1,0 +1,26 @@
+{% extends "index.html" %}
+
+{% block categoryproductlist %}
+<h3 style="text-align:center">{{ category.title }}</h3>  
+{% comment %} <ul class="list-group">
+    {% for product in products %}
+    <li class="list-group-item">{{ product.title }}</li> 
+    {% endfor %}
+</ul> {% endcomment %}
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-4">
+      <div class="card mb-4" style="width: 18rem;">
+        <img src="{{ product.image.url }}" class="card-img-top" alt="image">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.title }}</h5>
+          <p class="card-text"><b>description</b>:{{ product.description }} || <b>price</b>:{{ product.price }} ||<b>old_price</b>:<strike> {{ product.old_price }}</strike></p>
+          <p><a href="{% url 'product_detail_view' pid=product.pid %}">View details</a></p>
+          <a href="#" class="btn btn-primary">Add to cart</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+{% endblock %}

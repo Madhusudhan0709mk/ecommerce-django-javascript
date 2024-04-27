@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+
+{% block category %}
+    <h1 style = "text-align:center">Categories</h1>
+   
+        <ul class="list-group ">
+            {% for category in categories %}
+            <li class="list-group-item list-group-item-primary" style = "text-align:center"><a href="{% url 'category_product_list' category.cid %}" >{{ category.title }}</a></li>
+            {% endfor %}
+            
+          </ul>
+        
+
+{% endblock %}

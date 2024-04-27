@@ -61,8 +61,9 @@ class Tags(models.Model):
 class Product(models.Model):
     
     pid = ShortUUIDField(unique=True,length=10,max_length=20,alphabet="abcdefgh12345",prefix="pro")
+    vendor = models.ForeignKey(Vendor,on_delete=models.SET_NULL,null=True)
     
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True)
+    
     category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True)
 
     title = models.CharField(max_length=100)
@@ -80,7 +81,7 @@ class Product(models.Model):
     status = models.BooleanField(default=True)
     featured = models.BooleanField(default=True)
     digital = models.BooleanField(default=True)
-    
+    quantity = models.IntegerField(default=0)
     sku = ShortUUIDField(unique=True,length=4,max_length=20,alphabet="1234567890",prefix="sku")
     
     date = models.DateTimeField(auto_now_add=True)

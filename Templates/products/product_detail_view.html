@@ -1,0 +1,61 @@
+{% extends "index.html" %}
+{% block content %}
+<!-- Product Details Section Begin -->
+<section class="product-details spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <div class="product__details__pic">
+                    {% if product.image %}
+                     <div class="product__details__pic__item">
+                        <img class="product__details__pic__item--large"
+                            src="{{ product.image.url }}" alt="">
+                    </div> 
+                    {% else %}
+                    <span>No Image Available</span>
+                   {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="product__details__text">
+                    <h3>{{ product.title }}</h3>
+                    <div class="product__details__rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-half-o"></i>
+                        <span>(18 reviews)</span>
+                    </div>
+                    <div class="product__details__price">RS {{ product.price }} || <strike>{{ product.old_price }}</strike></div>
+                    <p>{{ product.description }}</p>
+                    <div class="product__details__quantity">
+                        <form method="POST" action="{% url 'increment_quantity' pid=product.pid %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">-</button>
+                            {{ product.quantity }}
+                            <button type="submit" class="btn btn-primary">+</button>
+                        </form>
+                    </div>
+                    <a href="#" class="primary-btn">ADD TO CARD</a>
+                    <a href="#" class="heart-icon"><span class="icon_heart_alt"></span></a>
+                    <ul>
+                        <li><b>Availability</b> <span>
+                            {% if product.in_stock %}
+                            <span>Instock</span> 
+                            {% else %}
+                            <span>Out of stock</span> 
+                            {% endif %}
+                       </span></li>
+                        <li><b>Vendor</b> <span>{{ product.vendor }}</span></li>
+                        <li><b>Product Status</b> <span>{{ product.product_status }}</span></li>
+                        <li><div><b>Product by vendor date </b>:</div> <span>{{ product.date }}</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+<!-- Product Details Section End -->
+{% endblock %}

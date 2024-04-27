@@ -22,7 +22,7 @@ class WishlistAdmin(admin.ModelAdmin):
     list_display=['user','product','date']
     
 class ProductAdmin(admin.ModelAdmin):
-    list_display=['user','category','title','price','old_price','product_status','in_stock','status','digital','featured','date']
+    list_display=['vendor','category','title','price','old_price','product_status','in_stock','status','digital','featured','date']
 
 class VendorAdmin(admin.ModelAdmin):
     list_display=['user','title','address','contact']
