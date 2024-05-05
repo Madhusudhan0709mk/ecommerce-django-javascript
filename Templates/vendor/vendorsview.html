@@ -1,0 +1,27 @@
+{% extends 'index.html' %}
+{% block content %}
+<table class="table">
+    <thead>
+      <tr>
+       
+        <th scope="col">vendor name</th>
+        <th scope="col">title</th>
+        <th scope="col">address</th>
+        <th scope="col">contact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for vendor in vendors %}
+        <td scope="row">{{ vendor }} </td>
+        
+        <td>{{ vendor.title }}</td>
+        <td>{{ vendor.address}}</td>
+        <td>{{ vendor.contact}}</td>
+        
+        {% endfor %}
+        
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}

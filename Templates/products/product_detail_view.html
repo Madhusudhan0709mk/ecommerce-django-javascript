@@ -1,5 +1,6 @@
 {% extends "index.html" %}
 {% block content %}
+
 <!-- Product Details Section Begin -->
 <section class="product-details spad">
     <div class="container">
@@ -20,24 +21,23 @@
                 <div class="product__details__text">
                     <h3>{{ product.title }}</h3>
                     <div class="product__details__rating">
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star"></i>
-                        <i class="fa fa-star-half-o"></i>
-                        <span>(18 reviews)</span>
+                        {{ starrating }}
+                        <span>({{ reviewcount }} reviews)</span>
+                        <span>Average rating : {{ avg_rating.rating__avg }}</span>
                     </div>
                     <div class="product__details__price">RS {{ product.price }} || <strike>{{ product.old_price }}</strike></div>
                     <p>{{ product.description }}</p>
-                    <div class="product__details__quantity">
-                        <form method="POST" action="{% url 'increment_quantity' pid=product.pid %}">
+                    {% comment %} <div class="product__details__quantity">
+                        <form id="quantityForm" method="POST" action="{% url 'increment_quantity' pid=product.pid %}">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">-</button>
-                            {{ product.quantity }}
-                            <button type="submit" class="btn btn-primary">+</button>
+                            <button type="button" class="btn btn-primary" onclick="updateQuantity(-1)">-</button>
+                            <span id="quantityDisplay">{{ product.quantity }}</span>
+                            <button type="button" class="btn btn-primary" onclick="updateQuantity(1)">+</button>
                         </form>
-                    </div>
-                    <a href="#" class="primary-btn">ADD TO CARD</a>
+                    </div> {% endcomment %}
+                    <!-- Example usage in a template -->
+
+                    <a href="{% url 'addtocart' pid=product.pid %}" class="primary-btn">ADD TO CARD</a>
                     <a href="#" class="heart-icon"><span class="icon_heart_alt"></span></a>
                     <ul>
                         <li><b>Availability</b> <span>
@@ -48,7 +48,8 @@
                             {% endif %}
                        </span></li>
                         <li><b>Vendor</b> <span>{{ product.vendor }}</span></li>
-                        <li><b>Product Status</b> <span>{{ product.product_status }}</span></li>
+                      
+                        {% comment %} <li><b>Product Status</b> <span>{{ product.product_status }}</span></li> {% endcomment %}
                         <li><div><b>Product by vendor date </b>:</div> <span>{{ product.date }}</span></li>
                     </ul>
                 </div>
@@ -57,5 +58,37 @@
         </div>
     </div>
 </section>
+<script>
+    async function updateQuantity(change) {
+        const form = document.getElementById("quantityForm");
+        const quantityDisplay = document.getElementById("quantityDisplay");
+        const currentQuantity = parseInt(quantityDisplay.innerHTML);
+        let newQuantity = currentQuantity + change;
+
+        // Ensure quantity doesn't go below zero
+        newQuantity = Math.max(newQuantity, 0);
+        
+        // Update the quantity display
+        quantityDisplay.innerHTML = newQuantity;
+
+        // Set the new quantity in the form data
+        const formData = new FormData(form);
+        formData.set("quantity", newQuantity);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            // You can handle success response here if needed
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle errors here
+        }
+    }
+</script>
 <!-- Product Details Section End -->
 {% endblock %}

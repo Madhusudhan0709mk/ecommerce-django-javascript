@@ -1,7 +1,7 @@
 from django.db import models
 from shortuuid.django_fields import ShortUUIDField
 from django.conf import settings
-
+from django.contrib.auth import get_user_model
 STATUS_CHOICE={
     ("process","Processing"),
     ("shipped","Shipped"),
@@ -87,13 +87,14 @@ class Product(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(null=True,blank=True)
     
+    def total(self):
+        return self.price*self.quantity
     
     def __str__(self):
         return self.title
     
-    def get_percentage(self):
-        new_price = (self.price/self.old_price)*100
-        return new_price
+   
+
     
     
 class ProductImages(models.Model):
@@ -104,20 +105,22 @@ class ProductImages(models.Model):
     class Meta:
         verbose_name_plural="Product Images"
     
-class CartOrder(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=12, decimal_places=2, default=100)
-    paid_status = models.BooleanField(default=False)
-    order_date = models.DateTimeField(auto_now_add=True)
-    product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
+# class CartOrder(models.Model):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+#     price = models.DecimalField(max_digits=12, decimal_places=2, default=100)
+#     paid_status = models.BooleanField(default=False)
+#     order_date = models.DateTimeField(auto_now_add=True)
+#     product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
     
     
-    # class Meta:
-    #     verbose_name_plural="Cart Order"
+#     class Meta:
+#         verbose_name_plural="Cart Order"
     
     
 class CartOrderItems(models.Model):
-    order = models.ForeignKey(CartOrder,on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # order = models.ForeignKey(CartOrder,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True,blank=True)
     product_status = models.CharField(max_length=200)
     item = models.CharField(max_length=200)  
     image= models.ImageField(upload_to="cartorderitems/images/",null=True,blank=True)

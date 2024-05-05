@@ -8,11 +8,11 @@ from .models import *
 class CategoryAdmin(admin.ModelAdmin):
     list_display=['title']
 
-class CartOrderAdmin(admin.ModelAdmin):
-    list_display=['user','price','paid_status','product_status','order_date']
+# class CartOrderAdmin(admin.ModelAdmin):
+#     list_display=['user','price','paid_status','product_status','order_date']
     
 class CartOrderItemsAdmin(admin.ModelAdmin):
-    list_display=['order','product_status','item','quantity','price','total']
+    list_display=['quantity','price','total']
 
 
 class AddressAdmin(admin.ModelAdmin):
@@ -34,7 +34,7 @@ class ProductImagesAdmin(admin.ModelAdmin):
     list_display=['product','date']  
     
 admin.site.register(Category,CategoryAdmin)
-admin.site.register(CartOrder,CartOrderAdmin)
+# admin.site.register(CartOrder,CartOrderAdmin)
 admin.site.register(CartOrderItems,CartOrderItemsAdmin)
 admin.site.register(Address,AddressAdmin)
 admin.site.register(Wishlist,WishlistAdmin)

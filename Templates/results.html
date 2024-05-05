@@ -1,0 +1,10 @@
+{% extends 'index.html' %}
+
+{% block results %}
+{% if searched %}
+
+  {% for result in results %}
+  {{ result.title }}
+  {% endfor %}
+{% endif %}
+{% endblock %}
