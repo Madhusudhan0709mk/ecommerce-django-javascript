@@ -36,8 +36,12 @@
                         </form>
                     </div> {% endcomment %}
                     <!-- Example usage in a template -->
-
-                    <a href="{% url 'addtocart' pid=product.pid %}" class="primary-btn">ADD TO CARD</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'addtocart' product.pid %}" class="primary-btn">ADD TO CART</a>
+                    {% else %}
+                    <a href="#" onclick="alert('You should be logged in to add items to the cart.')" class="primary-btn">ADD TO CART</a>
+                    {% endif %}
+                
                     <a href="#" class="heart-icon"><span class="icon_heart_alt"></span></a>
                     <ul>
                         <li><b>Availability</b> <span>

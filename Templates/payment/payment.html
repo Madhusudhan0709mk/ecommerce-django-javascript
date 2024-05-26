@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<ul>
+    {% for item in cartitems %}
+        <li>{{ item.product }} - {{ item.price }} x {{ item.quantity }}</li>
+    {% endfor %}
+</ul>
+<p>Total Amount: {{ total_amount }}</p>
+<p>Shipping Address: {{ address }}</p>
+<h2>Payment</h2>
+<form action="{% url 'payment_success' %}" method="post">
+    {% csrf_token %}
+    <script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ order_id }}"
+        data-amount="{{ total_amount * 100 }}"
+        data-name="Your Store Name"
+        data-description="Payment for Order"
+        data-image="path_to_your_logo"
+        data-prefill.name="{{ request.user.first_name }} {{ request.user.last_name }}"
+        data-prefill.email="{{ request.user.email }}"
+        data-theme.color="#F37254"
+    ></script>
+    <input type="hidden" custom="Hidden Element" name="hidden">
+    <button type="submit" class="site-btn">PAY NOW</button>
+</form>
+</body>
+</html>
+
+

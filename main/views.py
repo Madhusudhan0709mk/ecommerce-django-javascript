@@ -1,3 +1,4 @@
+import razorpay
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import *
 from django.contrib import messages
@@ -5,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Avg,Q
 from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your views here.
 def home(request):
@@ -139,14 +141,61 @@ def shopdetail(request):
 # def cart(request):
 #     return render(request,'carts/cart.html')
 
-@login_required 
+# @login_required 
+# def checkout(request):
+#     user= request.user
+#     order_items = CartOrderItems.objects.filter(user=user)
+#     sum = 0
+#     for item in order_items:
+#         item.total_price = item.price * item.quantity
+        
+#         sum += item.total_price
+#     context={
+#         'order_items':order_items,
+#         'sum':sum
+#     }
+#     return render(request,'checkout.html',context)
+
 def checkout(request):
-    return render(request,'checkout.html')
+    user = request.user
+    cartitems = CartOrderItems.objects.filter(user=user)
+    
+    # Retrieve or create the order for the user
+    # order, created = CartOrder.objects.get_or_create(user=user)
+    
+    # Add cart items to the order if it's created just now
+    sum = 0
+    for item in cartitems:
+        item.total_price = item.price * item.quantity
+        
+        sum += item.total_price
+  
+    
+    # if request.method == "POST":
+    #     address = request.POST.get("address")
+    #     # Assuming Razorpay payment integration
+    #     client = razorpay.Client(auth=("rzp_test_0boXf9daHcew7J", "6S17iOMVngx650gpxZglTY5h"))
+    #     payment = client.order.create({'amount': sum * 100, 'currency': 'INR', 'payment_capture': '1'})
+    #     context = {
+    #         'order_id': payment['id'],
+    #         'cartitems': cartitems,
+    #         'total_amount': sum,
+    #         'address': address,
+    #         'order':order
+    #     }
+    #     return render(request, 'payment.html', context)
+
+    context={
+        'cartitems':cartitems,
+        'sum':sum
+    }
+    return render(request, 'checkout.html', context)
 
 
 @login_required 
 def shop(request):
     return render(request,'shop.html')
+
 
 @login_required
 def vendorsview(request):

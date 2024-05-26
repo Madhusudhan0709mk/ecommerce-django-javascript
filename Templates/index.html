@@ -217,7 +217,7 @@
                             <ul class="featured__item__pic__hover">
                                 <li><a href="#"><i class="fa fa-heart"></i></a></li>
                                 <li><a href="{% url 'product_detail_view' product.pid %}"><i class="fa fa-ellipsis-h"></i></a></li>
-                                <li><a href="#"><i class="fa fa-cart-plus"></i></a></li>
+                                <li><a href="{% url 'addtocart' product.pid %}"><i class="fa fa-cart-plus"></i></a></li>
                             </ul>
                         </div>
                         <div class="featured__item__text">

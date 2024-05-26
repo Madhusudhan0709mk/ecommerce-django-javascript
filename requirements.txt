@@ -1,0 +1,4 @@
+django
+ckeditor5
+razorpay
+jazzmin

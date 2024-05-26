@@ -105,17 +105,6 @@ class ProductImages(models.Model):
     class Meta:
         verbose_name_plural="Product Images"
     
-# class CartOrder(models.Model):
-#     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-#     price = models.DecimalField(max_digits=12, decimal_places=2, default=100)
-#     paid_status = models.BooleanField(default=False)
-#     order_date = models.DateTimeField(auto_now_add=True)
-#     product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
-    
-    
-#     class Meta:
-#         verbose_name_plural="Cart Order"
-    
     
 class CartOrderItems(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -134,6 +123,22 @@ class CartOrderItems(models.Model):
     def order_img(self):
         return self.image
     
+    
+    
+class CartOrder(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
+    order = models.ManyToManyField(CartOrderItems)
+    address = models.CharField(max_length=225,null =True,blank=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, default=100)
+    paid = models.BooleanField(default=False)
+    order_date = models.DateTimeField(auto_now_add=True)
+    product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
+    
+    
+    class Meta:
+        verbose_name_plural="Cart Order"
+        
+        
 class ProductReview(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.SET_NULL,null =True)
@@ -161,10 +166,3 @@ class  Wishlist(models.Model):
     def __str__(self):
         return self.product.title
     
-class Address(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True)
-    address = models.CharField(max_length=225,null =True)
-    status = models.BooleanField(default=False)
-    
-    class Meta:
-        verbose_name_plural="Address"

@@ -15,8 +15,8 @@ class CartOrderItemsAdmin(admin.ModelAdmin):
     list_display=['quantity','price','total']
 
 
-class AddressAdmin(admin.ModelAdmin):
-    list_display=['user','address','status']
+# class AddressAdmin(admin.ModelAdmin):
+#     list_display=['user','address','status']
     
 class WishlistAdmin(admin.ModelAdmin):
     list_display=['user','product','date']
@@ -36,7 +36,7 @@ class ProductImagesAdmin(admin.ModelAdmin):
 admin.site.register(Category,CategoryAdmin)
 # admin.site.register(CartOrder,CartOrderAdmin)
 admin.site.register(CartOrderItems,CartOrderItemsAdmin)
-admin.site.register(Address,AddressAdmin)
+# admin.site.register(Address,AddressAdmin)
 admin.site.register(Wishlist,WishlistAdmin)
 admin.site.register(Product,ProductAdmin)
 admin.site.register(ProductImages,ProductImagesAdmin)

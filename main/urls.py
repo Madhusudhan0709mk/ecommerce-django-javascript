@@ -13,5 +13,6 @@ urlpatterns = [
     path('addtocart/<str:pid>/',views.addtocart,name='addtocart'),
     path('vendorsview/',views.vendorsview,name='vendorsview'),
      path('viewaddtocart/',views.viewaddtocart,name='viewaddtocart'),
+
     
 ]

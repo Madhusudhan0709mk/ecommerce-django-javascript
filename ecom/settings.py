@@ -127,3 +127,6 @@ AUTH_USER_MODEL = 'userauths.User'
 #     'site_brand'== 'ECOMMERCE',
 #     #   'site_logo': 'ECOMMERCE'
 # ]
+# settings.py
+RAZORPAY_KEY_ID = 'your_razorpay_key_id'
+RAZORPAY_KEY_SECRET = 'your_razorpay_key_secret'
