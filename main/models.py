@@ -96,22 +96,12 @@ class Product(models.Model):
    
 
     
-    
-class ProductImages(models.Model):
-    image= models.ImageField(upload_to="product/images/",null=True,blank=True)
-    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null =True)
-    date = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name_plural="Product Images"
+
     
     
 class CartOrderItems(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    # order = models.ForeignKey(CartOrder,on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True,blank=True)
-    product_status = models.CharField(max_length=200)
-    item = models.CharField(max_length=200)  
     image= models.ImageField(upload_to="cartorderitems/images/",null=True,blank=True)
     quantity = models.IntegerField(default = 0)
     price = models.DecimalField(max_digits=12, decimal_places=2, default="100")
@@ -134,7 +124,11 @@ class CartOrder(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     product_status = models.CharField(choices=STATUS_CHOICE,max_length=10,default="processing")
     
-    
+    razorpay_order_id = models.CharField(max_length=100,null=True,blank=True)
+    razorpay_payment_id = models.CharField(max_length=100,null=True,blank=True)
+    razorpay_payment_status = models.CharField(max_length=100,null=True,blank=True)
+    razorpay_signature = models.CharField(max_length=100,null=True,blank=True)
+
     class Meta:
         verbose_name_plural="Cart Order"
         

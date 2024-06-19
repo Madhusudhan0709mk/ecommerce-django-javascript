@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'userauths',
+   
  
 ]
 
@@ -122,11 +123,13 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'userauths.User'
 
-# JAZZMIN_SETTINGS = [
-#     'site_header'=='ECOMMERCE',
-#     'site_brand'== 'ECOMMERCE',
-#     #   'site_logo': 'ECOMMERCE'
-# ]
+
 # settings.py
-RAZORPAY_KEY_ID = 'your_razorpay_key_id'
-RAZORPAY_KEY_SECRET = 'your_razorpay_key_secret'
+
+RAZORPAY_KEY_ID = 'rzp_test_L1AeQjHkGVt5VW'
+RAZORPAY_KEY_SECRET = 'N2I4zFfPBJ2AobABBoOTspus'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost',
+    'http://127.0.0.1',
+]

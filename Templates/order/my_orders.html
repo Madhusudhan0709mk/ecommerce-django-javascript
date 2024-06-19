@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>My Orders</h1>
+
+{% for order in paid_orders %}
+    <h2>Order ID: {{ order.id }}</h2>
+    <p>Order Date: {{ order.order_date }}</p>
+    <p>Order Status: {{ order.product_status }}</p>
+    <p>Delivery Address: {{ order.address }}</p>
+    <p>Total Price: {{ order.price }}</p>
+    <h3>Products:</h3>
+    <ul>
+        {% for item in order.order.all %}
+            <li>
+                {{ item.product.title }} - Quantity: {{ item.quantity }} - Price: {{ item.price }} - Total: {{ item.total }}
+            </li>
+        {% endfor %}
+    </ul>
+    <hr>
+{% endfor %}
+</body>
+</html>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zxx">
 {% load static %}
+{% load custom_filters %}
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="Ogani Template">
@@ -134,19 +135,20 @@
                         <div class="col-lg-8 col-md-6">
                            <div class="checkout__input">
                                 <p>Address<span>*</span></p>
-                                <input type="text" placeholder="Street Address" class="checkout__input__add">
+                               {% comment %} < textarea >class="checkout__input__add"  style="color: chocolate;"> {% endcomment %}
+                               <textarea name="Address" id="Address" rows="4" cols="45" style="color: chocolate;"></textarea>
                             </div>
                            <div class="row">
                                 <div class="col-lg-6">
                                     <div class="checkout__input">
                                         <p>Phone<span>*</span></p>
-                                        <input type="text">
+                                        <input type="text" style="color: chocolate;" >
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="checkout__input">
                                         <p>Email<span>*</span></p>
-                                        <input type="text">
+                                        <input type="text" value="{{ user.email }}" style="color: chocolate;">
                                     </div>
                                 </div>
                             </div>
@@ -155,11 +157,11 @@
                             <div class="checkout__order">
                             <form method='POST' action="#">
                                 <h4>Your Order</h4>
-                                <div class="checkout__order__products">Products <span>Total</span></div>
+                                <div class="checkout__order__products">Products <span>Quantity X Price</span></div>
                                 <ul>
                                     {% if cartitems %}
                                     {% for item in cartitems %}
-                                    <li>{{ item.product.title }}<span>{{ item.total_price }}</span></li>
+                                    <li>{{ item.product.title }}<span>{{item.quantity}} X {{ item.price }}</span></li>
                                 </ul>
                                
                                 <div class="checkout__order__total">Total <span>{{ sum }}</span></div>
@@ -169,12 +171,30 @@
                           
                 
                  
-                                <button type="submit" class="site-btn" ><a href="#">PLACE ORDER</a></button>
+                                <button type="submit" class="site-btn" ><a href="{% url 'place_order' %}">PLACE ORDER</a></button>
                             </form>
                             </div>
                         </div>
                     </div>
                 </form>
+                <form action="/payment_handler/" method="POST">
+                    <script
+                      src="https://checkout.razorpay.com/v1/checkout.js"
+                      data-key="{{ razorpay_key }}"
+                      data-amount="{{ sum_total|floatformat:2|multiply:100 }}"
+                      data-currency="{{ currency }}"
+                      data-order_id="{{ razorpay_order_id }}"
+                      data-buttontext="Pay Now"
+                      data-name="Your Store"
+                      data-description="Test Transaction"
+                      data-image="https://example.com/your_logo.jpg"
+                      data-prefill.name="{{ request.user.username }}"
+                      data-prefill.email="{{ request.user.email }}"
+                      data-theme.color="#F37254"
+                    ></script>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                  </form>
+                  
             </div>
         </div>
     </section>

@@ -6,7 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Avg,Q
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.http import HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 
 # Create your views here.
 def home(request):
@@ -56,24 +58,6 @@ def product_detail_view(request, pid):
     }
     return render(request, 'products/product_detail_view.html',context)
 
-
-def increment_quantity(request, pid):
-    if request.method == 'POST':
-       
-        product = Product.objects.get(pid=pid)
-        
-        
-        product.quantity += 1
-        product.save()
-        
-        
-        # messages.success(request, 'Quantity incremented successfully!')
-        
-        
-        return redirect('product_detail_view', pid=pid)
-    
-    
-
 def addtocart(request,pid):
     product = get_object_or_404(Product,pid=pid)
     user = request.user
@@ -85,6 +69,7 @@ def addtocart(request,pid):
     if created:
         # If the item is newly created, set its quantity to 1
         cart_item.quantity = 1
+        cart_item.save()
     else:
         # If the item already exists in the cart, increment its quantity by 1
         cart_item.quantity += 1
@@ -93,9 +78,10 @@ def addtocart(request,pid):
     cart_items= CartOrderItems.objects.filter(user=user)
     sum = 0
     for item in cart_items:
-        item.total_price = item.price * item.quantity
+        item.total = item.price * item.quantity
         
-        sum += item.total_price
+        sum += item.total
+        item.save()
         
         
     
@@ -112,9 +98,10 @@ def viewaddtocart(request):
     viewaddtocart = CartOrderItems.objects.filter(user=user)
     sum = 0
     for item in viewaddtocart:
-        item.total_price = item.price * item.quantity
+        item.total = item.price * item.quantity
+        sum += item.total
+        item.save()
         
-        sum += item.total_price
     context={
         'viewaddtocart':viewaddtocart,
         'sum': sum  
@@ -124,8 +111,8 @@ def viewaddtocart(request):
 @login_required
 def searchindex(request):
     if request.method == 'POST':
-        searched = request.POST.get('searched')  # Use get() method instead of dictionary-like key access
-        results = Product.objects.filter(title__icontains=searched)
+        searched = request.POST.get('searched','')  # Use get() method instead of dictionary-like key access
+        results = Product.objects.filter(Q(title__icontains=searched))
         if results:
             messages.success(request, 'Your search results')
         else:
@@ -137,59 +124,109 @@ def searchindex(request):
 def shopdetail(request):
     return render(request,'shopdetail.html')
 
-# @login_required 
-# def cart(request):
-#     return render(request,'carts/cart.html')
 
-# @login_required 
-# def checkout(request):
-#     user= request.user
-#     order_items = CartOrderItems.objects.filter(user=user)
-#     sum = 0
-#     for item in order_items:
-#         item.total_price = item.price * item.quantity
-        
-#         sum += item.total_price
-#     context={
-#         'order_items':order_items,
-#         'sum':sum
-#     }
-#     return render(request,'checkout.html',context)
+
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID,settings.RAZORPAY_KEY_SECRET))
 
 def checkout(request):
+    
     user = request.user
     cartitems = CartOrderItems.objects.filter(user=user)
-    
-    # Retrieve or create the order for the user
-    # order, created = CartOrder.objects.get_or_create(user=user)
-    
-    # Add cart items to the order if it's created just now
     sum = 0
-    for item in cartitems:
-        item.total_price = item.price * item.quantity
-        
-        sum += item.total_price
-  
-    
-    # if request.method == "POST":
-    #     address = request.POST.get("address")
-    #     # Assuming Razorpay payment integration
-    #     client = razorpay.Client(auth=("rzp_test_0boXf9daHcew7J", "6S17iOMVngx650gpxZglTY5h"))
-    #     payment = client.order.create({'amount': sum * 100, 'currency': 'INR', 'payment_capture': '1'})
-    #     context = {
-    #         'order_id': payment['id'],
-    #         'cartitems': cartitems,
-    #         'total_amount': sum,
-    #         'address': address,
-    #         'order':order
-    #     }
-    #     return render(request, 'payment.html', context)
 
+    for item in cartitems:
+        item.total = item.price * item.quantity
+        sum += item.total
+        item.save()
+        
     context={
         'cartitems':cartitems,
-        'sum':sum
-    }
+        'sum':sum,
+    
+    }  
     return render(request, 'checkout.html', context)
+
+
+def place_order(request):
+    user = request.user
+    cartitems = CartOrderItems.objects.filter(user=user)
+    sum = 0
+
+    for item in cartitems:
+        item.total = item.price * item.quantity
+        sum += item.total
+        item.save()
+        
+    # razorpay order creating
+    order_amount  = int(sum * 100)
+    order_currency = 'INR'
+    order_receipt = f'order_rcptid_{user.id}'
+    
+    razorpay_order = razorpay_client.order.create({
+        'amount':order_amount ,
+        'currency':order_currency,
+        'receipt':order_receipt
+    })
+    
+    cart_order = CartOrder.objects.create(
+        user= user,
+        price= sum,
+        razorpay_order_id = razorpay_order['id']
+    )
+    
+    cart_order.order.set(cartitems)
+    
+    context={
+        'cartitems':cartitems,
+        'sum':sum,
+        'razorpay_order_id': razorpay_order['id'],
+        'razorpay_key': settings.RAZORPAY_KEY_ID,
+        'currency': order_currency,
+        'callback_url': 'payment_handler/'
+    }  
+    return render(request, 'checkout.html', context)
+    
+
+#  making payment handler vie taken from the checkout script form action of razorpay
+@csrf_exempt
+def payment_handler(request):
+    if request.method == "POST":
+        payment_id = request.POST.get('razorpay_payment_id','')
+        order_id = request.POST.get('razorpay_order_id','')
+        signature = request.POST.get('razorpay_signature', '')
+        
+        order = CartOrder.objects.get(razorpay_order_id = order_id)
+        
+        try:
+            order.paid = True
+            order.razorpay_payment_id = payment_id
+            order.razorpay_payment_status = 'success'
+            order.razorpay_signature=signature
+            order.save()
+            messages.success(request,'order confirmed ')
+            return redirect('home')
+        
+        except:
+            order.razorpay_payment_status = 'failed'
+            order.save()
+            messages.success(request,'order failed ')
+            return redirect('home')
+        
+    return HttpResponseBadRequest()
+
+
+def my_orders(request):
+    user = request.user
+    paid_orders = CartOrder.objects.filter(user=user, paid=True).prefetch_related('order')
+
+    context = {
+        'paid_orders': paid_orders,
+    }
+    return render(request, 'order/my_orders.html', context)
+
+# invoice for billing:
+def invoice(request):
+    return render(request,'invoice/invoice.html')
 
 
 @login_required 
