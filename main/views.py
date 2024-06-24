@@ -1,3 +1,4 @@
+
 import razorpay
 from django.shortcuts import render,get_object_or_404,redirect
 from .models import *
@@ -10,6 +11,8 @@ from django.http import HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
+from django.core.cache import cache
+CACHE_TTL = getattr(settings,'CACHE_TTL',60*15)
 # Create your views here.
 def home(request):
     products = Product.objects.all()
@@ -32,19 +35,30 @@ def category_product_list(request,cid):
 
 
 def product_detail_view(request, pid):
-    product = get_object_or_404(Product, pid=pid)
-    try:
-        productreview = ProductReview.objects.get(product=product)
-        starrating = "★" * productreview.rating + "☆" * (5 - productreview.rating)
-        reviewcount = ProductReview.objects.filter(product=product).count()
-        avg_rating = ProductReview.objects.filter(product=product).aggregate(Avg('rating'))
+    if cache.get(pid):
+        product = cache.get(pid)
+        print("data from cache")
+    else:    
+        product = get_object_or_404(Product, pid=pid)
+        try:
+            cache.set(pid,product)
+            print("DATA FROM DB")
+            productreview = ProductReview.objects.get(product=product)
+            starrating = "★" * productreview.rating + "☆" * (5 - productreview.rating)
+            reviewcount = ProductReview.objects.filter(product=product).count()
+            avg_rating = ProductReview.objects.filter(product=product).aggregate(Avg('rating'))
         
-    except:
+        except ProductReview.DoesNotExist:
+            productreview = None
+            starrating = None
+            reviewcount = 0
+            avg_rating = {'rating__avg': None} 
+            
+    if 'productreview' not in locals():
         productreview = None
         starrating = None
         reviewcount = 0
-        avg_rating = {'rating__avg': None} 
-        
+        avg_rating = {'rating__avg': None}
    
 
     context = {
