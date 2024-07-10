@@ -1,5 +1,5 @@
 django
-ckeditor5
+# ckeditor5
 razorpay
 jazzmin
 django-redis
